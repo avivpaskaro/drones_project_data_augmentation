@@ -8,3 +8,5 @@ Main script of the augmentation algorithm -
   5. Manually inspection - details below (**)  
   6. Create chance array that will be use in video randomization 
   7. Randomize, augmentation and merge 
+  
+  all of above controled through Main.m file
