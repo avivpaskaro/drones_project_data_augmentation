@@ -10,7 +10,7 @@ Date: Dec-2019
 
 function [v_drone_out, v_gt_out] ...
         = Augment ...
-        (v_drone_arr, v_gt_arr, v_indx, resolution, PID)
+        (v_drone_arr, v_gt_arr, v_indx, PID)
     
     load_bar    = waitbar(0,'Please wait...','Name','Creating Augment video');
     v_drone_out = cell(length(v_drone_arr),1);
@@ -21,7 +21,7 @@ function [v_drone_out, v_gt_out] ...
         v_drone = VideoReader([v_drone_arr{ii}.Path, '\', v_drone_arr{ii}.Filename]);
         v_gt    = VideoReader([v_gt_arr{ii}.Path, '\', v_gt_arr{ii}.Filename]);
         info_vid_drone{ii,1} = num2str(ii);
-        
+        resolution = [v_drone.Height v_drone.Width];
         tot_frames = v_gt.Duration*v_gt.FrameRate;
         
         %angle uniform around 360

@@ -12,7 +12,7 @@ Date: Dec-2019
 
 function DuplicateFrame(file_name, LENGTH, DISTANCE)
     load_bar = waitbar(0,'Please wait...','Name','Duplicate Frame');
-    fid        = fopen(['..\BgFiltered\', file_name]);
+    fid        = fopen(['.\BgFiltered\', file_name]);
     rd_data    = fscanf(fid, '%d');
     len        = length(rd_data);
     mass_table = cat(2, rd_data(mod(1:len,2) == 1), rd_data(mod(1:len,2) == 0));
@@ -46,8 +46,8 @@ function DuplicateFrame(file_name, LENGTH, DISTANCE)
     end
     
     video_name = strsplit(file_name,{'.txt'});
-    v_in = VideoReader(['..\BgFiltered\', video_name{1}, '.MP4']);
-    v_out_name      = ['..\DuplicateFrame\',video_name{1}]; 
+    v_in = VideoReader(['.\BgFiltered\', video_name{1}, '.MP4']);
+    v_out_name      = ['.\DuplicateFrame\',video_name{1}]; 
     v_out           = VideoWriter(v_out_name,'MPEG-4');
     v_out.FrameRate = v_in.FrameRate;
     zero_frame = zeros([v_in.Height, v_in.Width]);
@@ -88,7 +88,7 @@ function DuplicateFrame(file_name, LENGTH, DISTANCE)
         step = step + 1;
     end
     
-    writematrix(mass_table, ['..\DuplicateFrame\' ,video_name{1}, '_dup.txt'], 'Delimiter', 'tab');   
+    writematrix(mass_table, ['.\DuplicateFrame\' ,video_name{1}, '_dup.txt'], 'Delimiter', 'tab');   
     close(load_bar);
     close(v_out);  
 end

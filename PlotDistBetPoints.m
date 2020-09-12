@@ -27,7 +27,7 @@ function PlotDistBetPoints(directory)
                 Y = [Y, pdist(X,'euclidean')];
                 prevXY = currXY;
                 if(Y(curr_line_num) > 100)
-                    fprintf('dist > 100 at %d fr\n', curr_line_num)
+                    fprintf('distance is bigger than 100 at frame number %d \n', curr_line_num)
                 end
             end
 

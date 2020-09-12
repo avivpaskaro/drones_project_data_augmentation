@@ -10,7 +10,7 @@ Date: Dec-2019
 
 function [v_out_merge, v_out_gt] ...
         = Merge ...
-        (v_result, v_drone, v_urban, iter, read_resolution, write_resolution, PID)
+        (v_result, v_drone, v_urban, iter, write_resolution, PID)
     
    
 load_bar = waitbar(0,'Please wait...','Name','Merging between drone video and objects video');
@@ -28,7 +28,7 @@ alphablend_bg2.Opacity   = 0.15;
 
 % rand color
 drones_n = length(v_drone);
-if (randsample('01',1,true,[0 1]) == num2str(1))
+if (randsample('01',1,true,[0.5 0.5]) == num2str(1))
     color     = rand(1,drones_n,3);   
     colorflag = 1;
 else
@@ -77,16 +77,17 @@ v_out_merge           = VideoWriter(v_out_merge_name,'MPEG-4');
 v_out_gt              = VideoWriter(v_out_gt_name,'MPEG-4');
 v_out_merge.FrameRate = v_urban.FrameRate;
 v_out_gt.FrameRate    = v_urban.FrameRate;
+read_resolution       = [v_drone{1}.Height v_drone{1}.Width];
 open(v_out_merge);
 open(v_out_gt);
 
 start_t    = tic;
 curr_frame = 1;
 while hasFrame(v_urban) % Main loop
-    frame_urban = imresize(readFrame(v_urban),read_resolution);
+    frame_urban = readFrame(v_urban);
     for ii = 1:drones_n
-        frame_gt{ii}    = imresize(readFrame(v_result{ii}),read_resolution);
-        frame_drone{ii} = imresize(readFrame(v_drone{ii}),read_resolution);
+        frame_gt{ii}    = readFrame(v_result{ii});
+        frame_drone{ii} = readFrame(v_drone{ii});
     end 
     
     frame_ind_gt_tot = cat(3,false(read_resolution),false(read_resolution),false(read_resolution));

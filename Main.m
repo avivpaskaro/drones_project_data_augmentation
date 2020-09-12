@@ -4,9 +4,11 @@ Description: Main script of the augmentation algorithm -
              2. Duplicate misdetected frames of previous stage                  
              3. Erase frames that are probably noise              
              4. Plot the drone centers graph to inspect cleaning defects
-             5. Manually inspection - details below (**)  
-             6. Create chance array that will be use in video randomization 
-             7. Randomize, augmentation and merge 
+             5. Detect which frames were duplicated for future randomizing 
+                and video crop
+             6. Manually inspection - details below (**)  
+             7. Create chance array that will be use in video randomization 
+             8. Randomize, augmentation and merge 
 
 Creators: Aviv Paskaro, Stav Yeger
 
@@ -15,8 +17,8 @@ Date: Dec-2019
 
 
 %% 1 Step - Remove background from raw drone video     
-% Parameters                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-read_resolution = [2160 4069];
+% Parameters    
+crop_region     = [129 1 3839 2159]; % [Xleft Ytop Width-1 Height-1] 
 drones_dir      = 'Drones';
 window_size     = 15; 
 bg_filter       = false; 
@@ -26,7 +28,7 @@ if(bg_filter) % activate stage flag
         files = dir(drones_dir);    
         for ii = 3:length(files) 
            drone_video = files(ii).name; 
-           BgFiltering(drone_video, window_size, read_resolution);      
+           BgFiltering(drone_video, window_size, crop_region);      
         end    
     end
 end
@@ -74,19 +76,27 @@ if(plot_difference)
     PlotDistBetPoints(plots_dir)    
 end
 
-%%  5 Step - Manually inspection (**)     
+%%  5 Step - Detect which frames were duplicated for future randomizing and video crop
+% Parameters 
+detect_duplicate = false; % activate flag
+
+if(plot_difference)
+    DetectDuplicatedFrame()    
+end
+
+%%  6 Step - Manually inspection (**)     
 %{
 Separate videos, by inspecting the plots, for 3 groups:
 1. Fix is not needed
-2. Can be manually fixed
+2. Can be fixed manually 
 3. Non-fixable
-Try to resolve the issue non-fixable by spliting video or changes 
-Bgfiltering parameters and rerun. After that fix manually with ManualFrameDelete
+Try to resolve the issue non-fixable by spliting video or changes Bgfiltering
+parameters and rerun. After that fix manually with ManualFrameDelete
 and final collect all good video into FinalGT directory. Whatever cannot be fixed, 
 remove all drone video\gt from list.   
 %}
 
-%%  6 Step - Create chance array that will be use in video randomization    
+%%  7 Step - Create chance array that will be use in video randomization    
 % Parameters
 create_chance_arrays = false; % activate flag
 drones_dir = 'Drones';
@@ -97,29 +107,27 @@ if(create_chance_arrays)
     chance_arr_urban = ProbabilityArray(urbans_dir,'mp4');
 end
 
-%%  7 Step - Randomize, augmentation and merge   
+%%  8 Step - Randomize, augmentation and merge   
 % Parameters 
 create_dataset      = false; % activate flag
 write_resolution    = [720 1280];
-batch_size          = 5000; % dataset size
-duration            = 5;    % duration of video (sec)
+batch_size          = 3; % dataset size
+duration            = 1; % duration of video (sec)
 bg_filtered_vid_dir = 'FinalGT';
 
 if(create_dataset)
     tic
     for ii = 1:batch_size
         % Randomize
-        [v_drone, v_gt, v_urb, PID]  = Randomize(duration, drones_dir,... 
-            urbans_dir, bg_filtered_vid_dir, chance_arr_drone,...
+        [v_drone, v_gt, v_urb, PID]  = Randomize(duration, drones_dir, ... 
+            urbans_dir, bg_filtered_vid_dir, chance_arr_drone, ...
             chance_arr_urban, ii);    
         % Augmentation
-        [v_drone_aug, v_gt_aug] = Augment(v_drone, v_gt, ii,...
-            read_resolution, PID);    
+        [v_drone_aug, v_gt_aug] = Augment(v_drone, v_gt, ii, PID);    
         % Merge
-        Merge(v_gt_aug, v_drone_aug, v_urb, ii, read_resolution,...
-            write_resolution, PID);   
+        Merge(v_gt_aug, v_drone_aug, v_urb, ii, write_resolution, PID);   
 
-        rmdir(['PID_', num2str(feature('getpid')), '_iter_',...
+        rmdir(['PID_', num2str(feature('getpid')), '_iter_', ...
             num2str(ii)], 's')
     end
     toc

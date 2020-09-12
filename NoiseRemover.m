@@ -11,7 +11,7 @@ function NoiseRemover(file_name, LENGTH)
 
     load_bar  = waitbar(0,'Please wait...','Name','Noise Remover');
     file_name = strsplit(file_name, {'.txt'});
-    fid = fopen(['..\DuplicateFrame\', file_name{1}, '_dup.txt']);
+    fid = fopen(['.\DuplicateFrame\', file_name{1}, '_dup.txt']);
     rd_data = fscanf(fid, '%d');
     len = length(rd_data);
     mass_table = cat(2, rd_data(mod(1:len,2) == 1), rd_data(mod(1:len,2) == 0));
@@ -39,8 +39,8 @@ function NoiseRemover(file_name, LENGTH)
        mkdir('NoiseRemoved');
     end    
     video_name = file_name;
-    v_in = VideoReader(['..\DuplicateFrame\', video_name{1}, '.MP4']);
-    v_out_name      = ['..\NoiseRemoved\', video_name{1}]; 
+    v_in = VideoReader(['.\DuplicateFrame\', video_name{1}, '.MP4']);
+    v_out_name      = ['.\NoiseRemoved\', video_name{1}]; 
     v_out           = VideoWriter(v_out_name, 'MPEG-4');
     v_out.FrameRate = v_in.FrameRate;
     zero_frame = zeros([v_in.Height, v_in.Width]);
@@ -76,7 +76,7 @@ function NoiseRemover(file_name, LENGTH)
         step = step + 1;
     end
     
-    writematrix(mass_table, ['..\NoiseRemoved\' ,video_name{1}, '_filt.txt'], 'Delimiter', 'tab');   
+    writematrix(mass_table, ['.\NoiseRemoved\' ,video_name{1}, '_filt.txt'], 'Delimiter', 'tab');   
     close(load_bar);
     close(v_out);  
 end

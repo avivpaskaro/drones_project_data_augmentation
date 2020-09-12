@@ -8,13 +8,13 @@ Creators: Aviv Paskaro, Stav Yeger
 Date: Dec-2019  
 %}
 
-function v_out = BgFiltering(v_in, w_width, resolution)
+function v_out = BgFiltering(v_in, w_width, crop_region)
     load_bar = waitbar(0,'Please wait...','Name','Creating subtracted BG video');  
 	
     % parameters
     cleaning_threshold = 40; 
     frames_granularity = 24;
-    crop_region        = [129 1 3839 2159]; % [Xleft Ytop Width-1 Height-1] 
+    resolution         = [crop_region(4)+1, crop_region(3)+1];
 	
     % init script variables 
     v_name             = v_in;
