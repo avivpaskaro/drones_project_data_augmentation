@@ -1,6 +1,6 @@
 # Data augmentation
 
-Main script of the augmentation algorithm:           
+Augmentation algorithm:  
   1. Remove background from raw drone video              
   2. Duplicate misdetected frames of previous stage                  
   3. Erase frames that are probably noise              
